@@ -232,7 +232,7 @@ class AppController extends Controller
 
     public function user_name_exist_or_not(Request $request)
     {
-
+        
         $input = $request->all();
         
         $rules = [          
@@ -250,9 +250,28 @@ class AppController extends Controller
         }
 
         $get_user_name = DB::table('users')->select('user_name')->get()->toArray();
-      
-        dd($get_user_name);
 
+        $str = array();
+        foreach($get_user_name as $arr){       
+            $str[] = $arr->user_name; 
+        }
+
+       // dd($str);
+
+
+        //$check_user_name = DB::table('users')->whereIn('user_name',$str)->get();
+
+        if(in_array($request->user_name, $str)){
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid, User Name Already Exist',
+            ]);
+        }else{
+            return response()->json([
+                'success' => true,
+                'message' => 'User Name is Valid',
+            ]);
+        }
 
     }
 
