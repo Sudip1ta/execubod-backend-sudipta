@@ -7,6 +7,8 @@ use Carbon\Carbon;
 use App\Models\User;
 use Validator;
 use Hash;
+use DB;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -33,7 +35,8 @@ class AuthController extends Controller
             ]);
         }
  
-        $user = User::create([
+       // $user = User::create([
+        $user_temp = DB::table('users_temp')->insert([
             'first_name' => $input['first_name'],
             'last_name' => $input['last_name'],
             'user_name' => $input['user_name'],
@@ -66,8 +69,9 @@ class AuthController extends Controller
             <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
                 <div class="box" style="width:80%; margin: 0 auto; border: 1px solid rgba(0, 0, 0, 0.212); padding: 30px 80px;">
                     <div style="font-size: 20px; color: gray;">
-                        <p>Hello Administrator, </p>
-                        <p>We\'ve received an Email From '.$request->email.' For Contact Us Form .</p>
+                        <p>Hello '.$request->first_name.', </p>
+                        <p>You Have received an Email From Team ExcuBod For Registration Verification.</p>
+                        
                         
                         <p> Your OTP is : '.$otp. '</p>
                         
@@ -78,30 +82,38 @@ class AuthController extends Controller
         </html>';
 
 
-            try {
-                $maildata['messagebody_foruser'] = $html;
-                $maildata['toemail'] =  $request->email;
-                $maildata['fromemail'] = $hostname;
-                $mail_send = Mail::send(array(), $maildata, function ($message) use ($maildata) {
-                    $message->to($maildata['toemail'])
-                        ->subject('Contact Us')
-                        ->from($maildata['fromemail'], 'Remnant Tribe Network')
-                        ->setBody($maildata['messagebody_foruser'], 'text/html');
-                });
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Email send successfully.',
-                    ], 200);                    
-                
-            } catch (Exception $e) {
+        try {
+            $maildata['messagebody_foruser'] = $html;
+            $maildata['toemail'] =  $request->email;
+            $maildata['fromemail'] = $hostname;
+            $mail_send = Mail::send(array(), $maildata, function ($message) use ($maildata) {
+                $message->to($maildata['toemail'])
+                    ->subject('Verify Email')
+                    ->from($maildata['fromemail'], 'Team ExcuBod')
+                    ->setBody($maildata['messagebody_foruser'], 'text/html');
+            });
+            DB::table('users_temp')->where('id',$id)->update([
+                'otp'=> $otp,
+            ]); 
                 return response()->json([
-                    'success' => false,
-                    'message' => 'error. Failed',
-                ]);
-            }
+                    'success' => true,
+                    'message' => 'Email send successfully.',
+                    'otp' => $otp
+                ], 200);    
+                
+               
+            
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'error. Failed, Something Went Wrong ',
+            ]);
+
+            
+        }   
 
 
-
+        
 
 
 
@@ -109,10 +121,10 @@ class AuthController extends Controller
 
 
          
-        return response()->json([
-            'success' => true,
-            'message' => 'User registered succesfully.'
-        ], 200);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'User registered succesfully.'
+        // ], 200);
 
 
         // $request->validate([
@@ -129,6 +141,74 @@ class AuthController extends Controller
         // return response()->json([
         //     'message' => 'Successfully created user!'
         // ], 201);
+    }
+
+
+    public function register_otp_verify(Request $request)
+    {
+        $input = $request->all();
+
+        $rules = [
+            'otp'=>'required|max:4|min:4',
+            'email' => 'required',
+        ];
+
+        $validator = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration Failed',
+                'errors' => $validator->errors()
+            ]);
+        }
+
+
+        $otp_verify = DB::table('users_temp')->where('email',trim($input['email']))->where('otp',$input['otp'])->orderBy('id','DESC')->first();
+        //dd($otp_verify);
+
+        if(!empty($otp_verify->id)){
+
+            $user = User::create([       
+            'first_name' => $otp_verify->first_name,
+            'last_name' => $otp_verify->last_name,
+            'user_name' => $otp_verify->user_name,
+            'gender'=>$otp_verify->gender,
+            'dob' =>  $otp_verify->dob,
+            'email' => $otp_verify->email,
+            'password' => $otp_verify->password,
+            'otp' => ''
+        ]);
+
+
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->token; 
+
+        //dd($tokenResult);
+
+            User::where('id',$user->id)->update([
+                'last_login_at' => Carbon::now(),
+                'api_token'=>$tokenResult->accessToken,
+                //'otp' => ''
+            ]);
+
+            return response()->json([
+                'status'=>true,
+                'message' => 'Otp is verified.You have successfully register',
+                //'data' => $get_data,
+                'id' => $user->id,
+                'access_token' => $tokenResult->accessToken,
+                'token_type' => 'Bearer',
+            ]);
+
+        }else{
+            return response()->json([
+                'status'=>false,
+                'message'=>"Incorrect Otp.Please try again..."
+                
+            ]);
+        }
+
     }
   
     
@@ -169,6 +249,8 @@ class AuthController extends Controller
         ]);
     }
   
+
+    
     public function userName_email_verify(Request $request)
     {   
         $checkEmail = User::where('email',$request->email)->count();

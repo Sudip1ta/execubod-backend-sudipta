@@ -230,5 +230,32 @@ class AppController extends Controller
         ], 200);
     }
 
+    public function user_name_exist_or_not(Request $request)
+    {
+
+        $input = $request->all();
+        
+        $rules = [          
+            'user_name' => 'required'
+        ];
+
+        $validator = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Faild',
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        $get_user_name = DB::table('users')->select('user_name')->get()->toArray();
+      
+        dd($get_user_name);
+
+
+    }
+
+
 
 }
