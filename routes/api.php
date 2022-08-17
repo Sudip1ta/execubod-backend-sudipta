@@ -20,8 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('login', [AuthController::class,'login'])->name('login');
-    Route::post('signup', [AuthController::class,'signup']);
+    Route::post('login', [AuthController::class,'login'])->name('login');
+   
+   
     Route::post('verify', [AuthController::class,'userName_email_verify']);
 
     Route::post('app-intro', [AppController::class,'get_app_intro']);
@@ -48,9 +49,18 @@ Route::post('login', [AuthController::class,'login'])->name('login');
             Route::post('goals-fetch', [AppController::class,'get_goals']);
             Route::post('excercise-fetch', [AppController::class,'get_excercise']);
             
+
+            
+            
             
             
     });
 
+    Route::post('signup', [AuthController::class,'signup']);
+    Route::post('register_otp_verify',[AuthController::class,'register_otp_verify']);
+    
     Route::post('category_of_user',[AppController::class,'category_of_user']);
     Route::post('category_list',[AppController::class,'category_list']);
+
+    Route::post('user_name_exist',[AppController::class,'user_name_exist_or_not']);
+    
