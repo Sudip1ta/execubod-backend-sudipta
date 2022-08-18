@@ -71,6 +71,8 @@ use App\Http\Middleware\LoginCheck;
         Route::post(' pack-status-update',[PackagesController::class,'status_update']);
         Route::post(' package-delete',[PackagesController::class,'delete']);
         Route::get('{id}/package-details',[PackagesController::class,'get_pack_info']);
+
+        Route::get('package-add',[PackagesController::class,'create']);
         
 
 

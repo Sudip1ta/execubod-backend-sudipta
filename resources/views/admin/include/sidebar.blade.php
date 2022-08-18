@@ -31,7 +31,11 @@
 			<i class="fa-solid fa-dumbbell"></i>&nbsp;Excercise Management</span>
 		</a>
 
-		<a href="{{ url('all-packages')}}" class="list-group-item list-group-item-action py-2 ripple <?php active_nav(['all-packages','package-create','package-details']); ?>">
+		{{--<a href="{{ url('all-packages')}}" class="list-group-item list-group-item-action py-2 ripple <?php active_nav(['all-packages','package-create','package-details']); ?>">
+			<i class="fas fa-solid fa-boxes-stacked fa-fw me-3"></i><span>&nbsp;Packages</span>
+		</a>--}}
+
+    <a href="{{ url('all-packages')}}" class="list-group-item list-group-item-action py-2 ripple <?php active_nav(['all-packages','package-create','package-details']); ?>">
 			<i class="fas fa-solid fa-boxes-stacked fa-fw me-3"></i><span>&nbsp;Packages</span>
 		</a>
 

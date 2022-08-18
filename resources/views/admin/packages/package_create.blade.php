@@ -32,7 +32,7 @@
                         @endif
                     </div>
                 </div>
-                <form method="post" action="{{ url('package-submit')}}" >
+                  <form method="post" action="{{ url('package-submit')}}" >
                     @csrf
                
                 <div class="row mt-2">
@@ -43,6 +43,12 @@
                 </div>
 
                 <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label for="">Package Description</label>
+                        <textarea id="w3review" name="w3review" class="form-control" rows="4" cols="50"></textarea>
+                    </div>
+                </div>
+                {{--  <div class="row mt-2">
                     <div class="col-md-4">
                         <label for="category">Category</label>
                         <select name="category" id="category" class="form-control" required>
@@ -148,11 +154,11 @@
                             <button type="button" style="margin-top: 30px;" class="btn btn-primary btn-xs cloneBtn">Add More</button>
                         </div>
                     </div>
-                </div>
+                </div>--}}
                 
               
                 <input type="submit" class="btn btn-primary mt-2">
-            </form>
+            </form> 
             </div>
         </main>
 

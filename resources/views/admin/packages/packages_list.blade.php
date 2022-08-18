@@ -24,7 +24,7 @@
                         </div>
                     @endif
                 </div>
-                <div class="col-md-12">
+                {{--<div class="col-md-12">
                     <table class="table mt-2">
                         <thead class="table-primary">
                             <th>Pack No.</th>
@@ -74,7 +74,7 @@
                         </tbody>
                         
                     </table>
-                </div>
+                </div>--}}
             </div>
         </main>
 

@@ -236,7 +236,8 @@ class AuthController extends Controller
 
         User::where('id',$user->id)->update([
             'last_login_at' => Carbon::now(),
-            'api_token'=>$tokenResult->accessToken
+            'api_token'=>$tokenResult->accessToken,
+            
         ]);
 
         return response()->json([
